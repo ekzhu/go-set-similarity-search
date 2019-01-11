@@ -46,10 +46,9 @@ func main() {
     pairs, _ := SetSimilaritySearch.AllPairs(sets,    
         /*similarityFunctionName=*/"jaccard", 
         /*similarityThreshold=*/0.1)
-    // The pairs contain the indexes of sets to the original
-    // rawSets and sets slices.
     for pair := range pairs {
-        fmt.Println(pair)
+        // X and Y are indexes to the original rawSets and sets slices.
+        fmt.Println(pair.X, pair.Y, pair.Similarity)
     }
 }
 ```
@@ -84,10 +83,9 @@ func main() {
     querySet := dict.Transform([]string{"a", "c", "d"})
     // Query the search index.
     searchResults := searchIndex.Query(querySet)
-    // The results contain the indexes of sets to the original
-    // rawSets and sets slices.
     for _, result := range searchResults {
-        fmt.Println(result)
+        // X is the index to the original rawSets and sets slices.
+        fmt.Println(result.X, result.Similarity)
     }
 }
 ```
