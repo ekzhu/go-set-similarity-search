@@ -23,9 +23,10 @@ type postingListEntry struct {
 // threshold.  This is an implementation of the All-Pair-Binary algorithm in the
 // paper "Scaling Up All Pairs Similarity Search" by Bayardo et al., with
 // position and length filter enhancement.
+// Currently supported similarity functions are "jaccard" and "cosine".
 // This function returns a channel of Pairs which contains the indexes to
 // the input set slice.
-func AllPairs(sets [][]int, similarityFunction string,
+func AllPairs(sets [][]int, similarityFunctionName string,
 	similarityThreshold float64) (<-chan Pair, error) {
 	if len(sets) == 0 {
 		return nil, errors.New("input sets mut be a non-empty slice")
@@ -34,17 +35,17 @@ func AllPairs(sets [][]int, similarityFunction string,
 		return nil, errors.New("input similarityThreshold must be in the range [0, 1]")
 	}
 	var simFunc function
-	if f, exists := similarityFuncs[similarityFunction]; exists {
+	if f, exists := similarityFuncs[similarityFunctionName]; exists {
 		simFunc = f
 	} else {
-		return nil, errors.New("input similarityFunction does not exist")
+		return nil, errors.New("input similarityFunctionName does not exist")
 	}
-	if !symmetricSimilarityFuncs[similarityFunction] {
-		return nil, errors.New("input similarityFunction is not symmetric")
+	if !symmetricSimilarityFuncs[similarityFunctionName] {
+		return nil, errors.New("input similarityFunctionName is not symmetric")
 	}
-	overlapThresholdFunc := overlapThresholdFuncs[similarityFunction]
-	overlapIndexThresholdFunc := overlapIndexThresholdFuncs[similarityFunction]
-	positionFilterFunc := positionFilterFuncs[similarityFunction]
+	overlapThresholdFunc := overlapThresholdFuncs[similarityFunctionName]
+	overlapIndexThresholdFunc := overlapIndexThresholdFuncs[similarityFunctionName]
+	positionFilterFunc := positionFilterFuncs[similarityFunctionName]
 	pairs := make(chan Pair)
 	go func() {
 		// Create a slice of set indexes.

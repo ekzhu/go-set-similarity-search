@@ -20,6 +20,8 @@ var (
 	allPairsContainmentBenchmarkMinSize   = 10
 )
 
+// Read set similarity search benchmark files from
+// https://github.com/ekzhu/set-similarity-search-benchmarks
 func readGzippedTransformedSets(filename string,
 	firstLineInfo bool, minSize int) (sets [][]int) {
 	file, err := os.Open(filename)
@@ -70,7 +72,7 @@ func readGzippedTransformedSets(filename string,
 	return sets
 }
 
-func BenchmarkAllPairContainment(b *testing.B) {
+func BenchmarkOpenDataAllPairContainment(b *testing.B) {
 	log.Printf("Reading transformed sets from %s",
 		allPairsContainmentBenchmarkFilename)
 	start := time.Now()

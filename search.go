@@ -20,7 +20,9 @@ type SearchIndex struct {
 
 // NewSearchIndex builds a search index on the transformed sets given
 // the similarity function and threshold.
-func NewSearchIndex(sets [][]int, similarityFunction string,
+// Currently supported similarity functions are "jaccard", "cosine"
+// and "containment".
+func NewSearchIndex(sets [][]int, similarityFunctionName string,
 	similarityThreshold float64) (*SearchIndex, error) {
 	if len(sets) == 0 {
 		return nil, errors.New("input sets cannot be empty")
@@ -33,14 +35,14 @@ func NewSearchIndex(sets [][]int, similarityFunction string,
 		sets:         sets,
 		postingLists: make(map[int][]postingListEntry),
 	}
-	if f, exists := similarityFuncs[similarityFunction]; exists {
+	if f, exists := similarityFuncs[similarityFunctionName]; exists {
 		si.simFunc = f
 	} else {
-		return nil, errors.New("input similarityFunction is not supported")
+		return nil, errors.New("input similarityFunctionName is not supported")
 	}
-	si.overlapThresholdFunc = overlapThresholdFuncs[similarityFunction]
-	si.overlapIndexThresholdFunc = overlapIndexThresholdFuncs[similarityFunction]
-	si.positionFilterFunc = positionFilterFuncs[similarityFunction]
+	si.overlapThresholdFunc = overlapThresholdFuncs[similarityFunctionName]
+	si.overlapIndexThresholdFunc = overlapIndexThresholdFuncs[similarityFunctionName]
+	si.positionFilterFunc = positionFilterFuncs[similarityFunctionName]
 	// Index transformed sets.
 	for i, s := range sets {
 		t := si.overlapIndexThresholdFunc(len(s), si.threshold)

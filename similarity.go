@@ -1,5 +1,7 @@
 package SetSimilaritySearch
 
+import "math"
+
 func min(a, b int) int {
 	if a < b {
 		return a
@@ -55,6 +57,14 @@ func containment(s1, s2 []int) float64 {
 	return float64(intersectionSize) / float64(len(s1))
 }
 
+func cosine(s1, s2 []int) float64 {
+	if len(s1) == 0 && len(s2) == 0 {
+		return 0.0
+	}
+	intersectionSize := intersectionSize(s1, s2)
+	return float64(intersectionSize) / math.Sqrt(float64(len(s1)*len(s2)))
+}
+
 type overlapThresholdFunction func(int, float64) int
 
 // x is the set size
@@ -64,6 +74,12 @@ func jaccardOverlapThresholdFunc(x int, t float64) int {
 }
 
 var jaccardOverlapIndexThresholdFunc = jaccardOverlapThresholdFunc
+
+func cosineOverlapThresholdFunc(x int, t float64) int {
+	return int(math.Sqrt(float64(x)) * t)
+}
+
+var cosineOverlapIndexThresholdFunc = cosineOverlapThresholdFunc
 
 // This is used for query only.
 func containmentOverlapThresholdFunc(x int, t float64) int {
@@ -86,27 +102,37 @@ func containmentPositionFilter(s1, s2 []int, p1, p2 int, t float64) bool {
 	return float64(min(l1-p1, l2-p2))/float64(l1) >= t
 }
 
+func cosinePositionFilter(s1, s2 []int, p1, p2 int, t float64) bool {
+	l1, l2 := len(s1), len(s2)
+	return float64(min(l1-p1, l2-p2))/math.Sqrt(float64(max(l1, l2))) >= t
+}
+
 var similarityFuncs = map[string]function{
 	"jaccard":     jaccard,
 	"containment": containment,
+	"cosine":      cosine,
 }
 
 var overlapThresholdFuncs = map[string]overlapThresholdFunction{
 	"jaccard":     jaccardOverlapThresholdFunc,
 	"containment": containmentOverlapThresholdFunc,
+	"cosine":      cosineOverlapThresholdFunc,
 }
 
 var overlapIndexThresholdFuncs = map[string]overlapThresholdFunction{
 	"jaccard":     jaccardOverlapIndexThresholdFunc,
 	"containment": containmentOverlapIndexThresholdFunc,
+	"cosine":      cosineOverlapIndexThresholdFunc,
 }
 
 var positionFilterFuncs = map[string]positionFilter{
 	"jaccard":     jaccardPositionFilter,
 	"containment": containmentPositionFilter,
+	"cosine":      cosinePositionFilter,
 }
 
 var symmetricSimilarityFuncs = map[string]bool{
 	"jaccard":     true,
 	"containment": false,
+	"cosine":      true,
 }
