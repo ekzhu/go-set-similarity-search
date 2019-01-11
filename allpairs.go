@@ -16,6 +16,7 @@ type Pair struct {
 type postingListEntry struct {
 	setIndex      int
 	tokenPosition int
+	setSize       int
 }
 
 // AllPairs finds all pairs of transformed sets with similarity greater than a
@@ -36,24 +37,27 @@ func AllPairs(sets [][]int, similarityFunction string,
 	if f, exists := similarityFuncs[similarityFunction]; exists {
 		simFunc = f
 	} else {
-		return nil, errors.New("Input similarityFunction does not exist")
+		return nil, errors.New("input similarityFunction does not exist")
+	}
+	if !symmetricSimilarityFuncs[similarityFunction] {
+		return nil, errors.New("input similarityFunction is not symmetric")
 	}
 	overlapThresholdFunc := overlapThresholdFuncs[similarityFunction]
 	overlapIndexThresholdFunc := overlapIndexThresholdFuncs[similarityFunction]
 	positionFilterFunc := positionFilterFuncs[similarityFunction]
-	// Create a slice of set indexes.
-	indexes := make([]int, len(sets))
-	for i := range indexes {
-		indexes[i] = i
-	}
-	// Sort set indexes by set length.
-	sort.Slice(indexes, func(i, j int) bool {
-		return len(sets[i]) < len(sets[j])
-	})
 	pairs := make(chan Pair)
-	postingLists := make(map[int][]postingListEntry)
 	go func() {
+		// Create a slice of set indexes.
+		indexes := make([]int, len(sets))
+		for i := range indexes {
+			indexes[i] = i
+		}
+		// Sort set indexes by set length.
+		sort.Slice(indexes, func(i, j int) bool {
+			return len(sets[i]) < len(sets[j])
+		})
 		defer close(pairs)
+		postingLists := make(map[int][]postingListEntry)
 		// Main loop of the All-Pairs algorithm.
 		for _, x1 := range indexes {
 			s1 := sets[x1]
@@ -101,7 +105,7 @@ func AllPairs(sets [][]int, similarityFunction string,
 					postingLists[token] = make([]postingListEntry, 0)
 				}
 				postingLists[token] = append(postingLists[token],
-					postingListEntry{x1, j})
+					postingListEntry{x1, j, len(sets[x1])})
 			}
 		}
 	}()

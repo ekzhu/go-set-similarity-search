@@ -17,14 +17,14 @@ func TestTransform(t *testing.T) {
 		[]int{1, 2, 3, 4},
 		[]int{0, 1, 2, 3, 4},
 	}
-	correctOrder := map[string]int{
+	correctdict := map[string]int{
 		"a": 4,
 		"b": 3,
 		"c": 2,
 		"d": 1,
 		"e": 0,
 	}
-	sets, order := FrequencyOrderTransform(rawSets)
+	sets, dict := FrequencyOrderTransform(rawSets)
 	for i := range sets {
 		for j := range sets[i] {
 			if sets[i][j] != correctSets[i][j] {
@@ -33,11 +33,22 @@ func TestTransform(t *testing.T) {
 			}
 		}
 	}
-	for rawToken := range order {
-		if order[rawToken] != correctOrder[rawToken] {
-			t.Errorf("Expect %v's order is %v, got %v", rawToken,
-				correctOrder[rawToken], order[rawToken])
+	for rawToken := range dict {
+		if dict[rawToken] != correctdict[rawToken] {
+			t.Errorf("Expect %v's dict is %v, got %v", rawToken,
+				correctdict[rawToken], dict[rawToken])
 		}
 	}
 
+	rawSet := []string{"a", "e", "b", "f"}
+	correctSet := []int{0, 3, 4}
+	set := dict.Transform(rawSet)
+	for i := range set {
+		if set[i] != correctSet[i] {
+			t.Errorf("Expect transformed set %v got %v", correctSet, set)
+		}
+	}
+	if len(set) != len(correctSet) {
+		t.Errorf("Expect transformed set %v got %v", correctSet, set)
+	}
 }

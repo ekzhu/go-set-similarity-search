@@ -2,7 +2,7 @@ package SetSimilaritySearch
 
 import "testing"
 
-func checkIfExists(p Pair, pairs []Pair) bool {
+func pairExists(p Pair, pairs []Pair) bool {
 	for i := range pairs {
 		if p == pairs[i] {
 			return true
@@ -30,12 +30,12 @@ func TestAllPairJaccard(t *testing.T) {
 	}
 	count := 0
 	for p := range pairs {
-		if !checkIfExists(p, correctPairs) {
+		if !pairExists(p, correctPairs) {
 			t.Errorf("The pair %v is not correct", p)
 		}
 		count++
 	}
 	if count != len(correctPairs) {
-		t.Errorf("Expected %d pairs but found %d", len(correctPairs), count)
+		t.Errorf("Expecting %d pairs but found %d", len(correctPairs), count)
 	}
 }

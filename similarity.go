@@ -105,3 +105,8 @@ var positionFilterFuncs = map[string]positionFilter{
 	"jaccard":     jaccardPositionFilter,
 	"containment": containmentPositionFilter,
 }
+
+var symmetricSimilarityFuncs = map[string]bool{
+	"jaccard":     true,
+	"containment": false,
+}
