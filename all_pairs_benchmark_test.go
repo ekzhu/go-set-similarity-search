@@ -2,6 +2,7 @@ package SetSimilaritySearch
 
 import (
 	"encoding/csv"
+	"log"
 	"os"
 	"strconv"
 	"testing"
@@ -17,16 +18,15 @@ var (
 )
 
 func BenchmarkAllPair(b *testing.B) {
-	b.Logf("Reading transformed sets from %s",
+	log.Printf("Reading transformed sets from %s",
 		allPairBenchmarkFilename)
 	start := time.Now()
 	sets := readGzippedTransformedSets(allPairBenchmarkFilename,
 		/*firstLineInfo=*/ true,
 		allPairBenchmarkMinSize)
-	b.Logf("Finished reading %d transformed sets in %s", len(sets),
+	log.Printf("Finished reading %d transformed sets in %s", len(sets),
 		time.Now().Sub(start).String())
-
-	b.Logf("Running AllPairs algorithm")
+	log.Printf("Running AllPairs algorithm")
 	out, err := os.Create(allPairBenchmarkResult)
 	if err != nil {
 		b.Fatal(err)
@@ -43,7 +43,7 @@ func BenchmarkAllPair(b *testing.B) {
 			strconv.FormatFloat(pair.Similarity, 'f', 4, 64),
 		})
 	}
-	b.Logf("Finished AllPairs in %s", time.Now().Sub(start).String())
+	log.Printf("Finished AllPairs in %s", time.Now().Sub(start).String())
 	w.Flush()
 	if err := w.Error(); err != nil {
 		b.Fatal(err)
@@ -51,5 +51,5 @@ func BenchmarkAllPair(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	b.Logf("Results written to %s", allPairBenchmarkResult)
+	log.Printf("Results written to %s", allPairBenchmarkResult)
 }

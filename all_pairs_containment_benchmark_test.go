@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"compress/gzip"
 	"encoding/csv"
+	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -56,7 +58,12 @@ func readGzippedTransformedSets(filename string,
 				panic(err)
 			}
 		}
+		sets = append(sets, set)
+		if len(sets)%100 == 0 {
+			fmt.Printf("\rRead %d sets so far", len(sets))
+		}
 	}
+	fmt.Println()
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}
@@ -64,22 +71,22 @@ func readGzippedTransformedSets(filename string,
 }
 
 func BenchmarkAllPairContainment(b *testing.B) {
-	b.Logf("Reading transformed sets from %s",
+	log.Printf("Reading transformed sets from %s",
 		allPairsContainmentBenchmarkFilename)
 	start := time.Now()
 	sets := readGzippedTransformedSets(allPairsContainmentBenchmarkFilename,
 		/*firstLineInfo=*/ true,
 		allPairsContainmentBenchmarkMinSize)
-	b.Logf("Finished reading %d transformed sets in %s", len(sets),
+	log.Printf("Finished reading %d transformed sets in %s", len(sets),
 		time.Now().Sub(start).String())
-	b.Logf("Building search index")
+	log.Printf("Building search index")
 	start = time.Now()
 	searchIndex, err := NewSearchIndex(sets, "containment",
 		allPairsContainmentBenchmarkThreshold)
 	if err != nil {
 		b.Fatal(err)
 	}
-	b.Logf("Finished building search index in %s",
+	log.Printf("Finished building search index in %s",
 		time.Now().Sub(start).String())
 	out, err := os.Create(allPairsContainmentBenchmarkResult)
 	if err != nil {
@@ -87,8 +94,9 @@ func BenchmarkAllPairContainment(b *testing.B) {
 	}
 	defer out.Close()
 	w := csv.NewWriter(out)
-	b.Logf("Begin querying")
+	log.Printf("Begin querying")
 	start = time.Now()
+	var count int
 	for i, set := range sets {
 		results := searchIndex.Query(set)
 		for _, result := range results {
@@ -101,11 +109,16 @@ func BenchmarkAllPairContainment(b *testing.B) {
 				strconv.FormatFloat(result.Similarity, 'f', 4, 64),
 			})
 		}
+		count++
+		if count%100 == 0 {
+			fmt.Printf("\rQueried %d sets so far", count)
+		}
 	}
-	b.Logf("Finished querying in %s", time.Now().Sub(start).String())
+	fmt.Println()
+	log.Printf("Finished querying in %s", time.Now().Sub(start).String())
 	w.Flush()
 	if err := w.Error(); err != nil {
 		b.Fatal(err)
 	}
-	b.Logf("Results written to %s", allPairsContainmentBenchmarkResult)
+	log.Printf("Results written to %s", allPairsContainmentBenchmarkResult)
 }
