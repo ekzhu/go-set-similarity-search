@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	// Download from https://github.com/ekzhu/set-similarity-search-benchmarks
 	allPairOpenDataBenchmarkFilename  = "canada_us_uk_opendata.inp.gz"
 	allPairOpenDataBenchmarkResult    = "canada_us_uk_opendata_all_pairs.csv"
 	allPairOpenDataBenchmarkThreshold = 0.9
@@ -19,6 +20,7 @@ var (
 )
 
 var (
+	// Download from https://snap.stanford.edu/data/soc-Pokec.html
 	allPairsPokecBenchmarkFilename      = "soc-pokec-relationships.txt.gz"
 	allPairsPokecBenchmarkResult        = "soc-pokec-relationships-all-pairs.csv"
 	allPairsPokecBenchmarkThreshold     = 0.5
@@ -27,6 +29,7 @@ var (
 )
 
 var (
+	// Download from https://snap.stanford.edu/data/soc-LiveJournal1.html
 	allPairsLiveJournalBenchmarkFilename      = "soc-LiveJournal1.txt.gz"
 	allPairsLiveJournalBenchmarkResult        = "soc-LiveJournal1-all-pairs.csv"
 	allPairsLiveJournalBenchmarkFunction      = "jaccard"

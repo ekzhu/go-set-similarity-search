@@ -14,6 +14,7 @@ import (
 )
 
 var (
+	// Download from https://github.com/ekzhu/set-similarity-search-benchmarks
 	allPairsContainmentBenchmarkFilename  = "canada_us_uk_opendata.inp.gz"
 	allPairsContainmentBenchmarkResult    = "canada_us_uk_opendata_all_pairs_containment.csv"
 	allPairsContainmentBenchmarkThreshold = 0.9

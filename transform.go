@@ -5,9 +5,10 @@ import "sort"
 // Dictionary maps raw token to an integer token in the global order.
 type Dictionary map[string]int
 
-// FrequencyOrderTransform transforms tokens to integers according to global
-// frequency order. This step replaces all original tokens in the sets with
-// integers, and helps to speed up subsequent prefix filtering and similarity
+// FrequencyOrderTransform transforms string sets to integer sets according to
+// global frequency order, and returns the transformed sets in the same order as
+// the input sets and a dictionary for mapping string tokens to integer tokens.
+// This step speeds up subsequent prefix filtering and similarity
 // computation.  See Section 4.3.2 in the paper "A Primitive Operator for
 // Similarity Joins in Data Cleaning" by Chaudhuri et al..
 func FrequencyOrderTransform(rawSets [][]string) (sets [][]int,
@@ -50,8 +51,8 @@ func FrequencyOrderTransform(rawSets [][]string) (sets [][]int,
 	return sets, dict
 }
 
-// Transform takes a set of raw tokens and returns a set of integer tokens
-// based on a global order.
+// Transform takes a set of raw tokens and returns a set of integer tokens based
+// on the global frequency order.
 func (dict Dictionary) Transform(rawSet []string) (set []int) {
 	set = make([]int, 0, len(rawSet))
 	for _, rawToken := range rawSet {

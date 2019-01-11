@@ -31,6 +31,7 @@ import (
 
 
 func main() {
+    // Each raw set must be a slice of unique string tokens.
     rawSets := [][]string{
         []string{"a"},
         []string{"a", "b"},
@@ -38,10 +39,15 @@ func main() {
         []string{"a", "b", "c", "d"},
         []string{"a", "b", "c", "d", "e"},
     }
+    // Use frequency order transformation to replace the string tokens
+    // with integers.
     sets, _ := SetSimilaritySearch.FrequencyOrderTransform(rawSets)
+    // Run all-pairs algorithm, get a channel of pairs.
     pairs, _ := SetSimilaritySearch.AllPairs(sets,    
         /*similarityFunctionName=*/"jaccard", 
         /*similarityThreshold=*/0.1)
+    // The pairs contain the indexes of sets to the original
+    // rawSets and sets slices.
     for pair := range pairs {
         fmt.Println(pair)
     }
@@ -59,6 +65,7 @@ import (
 )
 
 func main() {
+    // Each raw set must be a slice of unique string tokens.
     rawSets := [][]string{
         []string{"a"},
         []string{"a", "b"},
@@ -66,12 +73,19 @@ func main() {
         []string{"a", "b", "c", "d"},
         []string{"a", "b", "c", "d", "e"},
     }
+    // Use frequency order transformation to replace the string tokens
+    // with integers.
     sets, dict := SetSimilaritySearch.FrequencyOrderTransform(rawSets)
+    // Build a search index.
     searchIndex, err := SetSimilaritySearch.NewSearchIndex(sets,
         /*similarityFunctionName=*/"jaccard", 
         /*similarityThreshold=*/0.1)
+    // Use dictionary to transform a query set.
     querySet := dict.Transform([]string{"a", "c", "d"})
+    // Query the search index.
     searchResults := searchIndex.Query(querySet)
+    // The results contain the indexes of sets to the original
+    // rawSets and sets slices.
     for _, result := range searchResults {
         fmt.Println(result)
     }
