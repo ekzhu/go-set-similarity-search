@@ -29,6 +29,42 @@ var (
 )
 
 var (
+	// Download from https://github.com/ekzhu/set-similarity-search-benchmarks
+	allPairKosarakBenchmarkFilename  = "KOSARAK_dup_dr.inp.gz"
+	allPairKosarakBenchmarkResult    = "KOSARAK_dup_dr_all_pairs.csv"
+	allPairKosarakBenchmarkThreshold = 0.2
+	allPairKosarakBenchmarkMinSize   = 1
+	allPairKosarakBenchmarkFunction  = "jaccard"
+)
+
+var (
+	// Download from https://github.com/ekzhu/set-similarity-search-benchmarks
+	allPairFlickrBenchmarkFilename  = "FLICKR-london2y_dup_dr.inp.gz"
+	allPairFlickrBenchmarkResult    = "FLICKR-london2y_all_pairs.csv"
+	allPairFlickrBenchmarkThreshold = 0.2
+	allPairFlickrBenchmarkMinSize   = 1
+	allPairFlickrBenchmarkFunction  = "jaccard"
+)
+
+var (
+	// Download from https://github.com/ekzhu/set-similarity-search-benchmarks
+	allPairNetflixBenchmarkFilename  = "NETFLIX_dup_dr.inp.gz"
+	allPairNetflixBenchmarkResult    = "NETFLIX_dup_dr_all_pairs.csv"
+	allPairNetflixBenchmarkThreshold = 0.2
+	allPairNetflixBenchmarkMinSize   = 1
+	allPairNetflixBenchmarkFunction  = "jaccard"
+)
+
+var (
+	// Download from https://github.com/ekzhu/set-similarity-search-benchmarks
+	allPairOrkutBenchmarkFilename  = "orkut_ge10.inp.gz"
+	allPairOrkutBenchmarkResult    = "orkut_ge10_all_pairs.csv"
+	allPairOrkutBenchmarkThreshold = 0.2
+	allPairOrkutBenchmarkMinSize   = 1
+	allPairOrkutBenchmarkFunction  = "jaccard"
+)
+
+var (
 	// Download from https://snap.stanford.edu/data/soc-Pokec.html
 	allPairsPokecBenchmarkFilename      = "soc-pokec-relationships.txt.gz"
 	allPairsPokecBenchmarkResult        = "soc-pokec-relationships-all-pairs.csv"
@@ -56,6 +92,30 @@ func BenchmarkBmsPosAllPair(b *testing.B) {
 	benchmarkAllPairRowFile(b, allPairBmsPosBenchmarkFilename,
 		allPairBmsPosBenchmarkResult, allPairBmsPosBenchmarkFunction,
 		allPairBmsPosBenchmarkThreshold, allPairBmsPosBenchmarkMinSize)
+}
+
+func BenchmarkKosarakAllPair(b *testing.B) {
+	benchmarkAllPairRowFile(b, allPairKosarakBenchmarkFilename,
+		allPairKosarakBenchmarkResult, allPairKosarakBenchmarkFunction,
+		allPairKosarakBenchmarkThreshold, allPairKosarakBenchmarkMinSize)
+}
+
+func BenchmarkFlickrAllPair(b *testing.B) {
+	benchmarkAllPairRowFile(b, allPairFlickrBenchmarkFilename,
+		allPairFlickrBenchmarkResult, allPairFlickrBenchmarkFunction,
+		allPairFlickrBenchmarkThreshold, allPairFlickrBenchmarkMinSize)
+}
+
+func BenchmarkNetflixAllPair(b *testing.B) {
+	benchmarkAllPairRowFile(b, allPairNetflixBenchmarkFilename,
+		allPairNetflixBenchmarkResult, allPairNetflixBenchmarkFunction,
+		allPairNetflixBenchmarkThreshold, allPairNetflixBenchmarkMinSize)
+}
+
+func BenchmarkOrkutAllPair(b *testing.B) {
+	benchmarkAllPairRowFile(b, allPairOrkutBenchmarkFilename,
+		allPairOrkutBenchmarkResult, allPairOrkutBenchmarkFunction,
+		allPairOrkutBenchmarkThreshold, allPairOrkutBenchmarkMinSize)
 }
 
 func benchmarkAllPairRowFile(b *testing.B, benchmarkFile, resultFile, function string, threshold float64, minSize int) {
