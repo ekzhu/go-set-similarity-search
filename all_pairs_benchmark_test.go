@@ -14,9 +14,18 @@ var (
 	// Download from https://github.com/ekzhu/set-similarity-search-benchmarks
 	allPairOpenDataBenchmarkFilename  = "canada_us_uk_opendata.inp.gz"
 	allPairOpenDataBenchmarkResult    = "canada_us_uk_opendata_all_pairs.csv"
-	allPairOpenDataBenchmarkThreshold = 0.9
+	allPairOpenDataBenchmarkThreshold = 0.2
 	allPairOpenDataBenchmarkMinSize   = 10
 	allPairOpenDataBenchmarkFunction  = "jaccard"
+)
+
+var (
+	// Download from https://github.com/ekzhu/set-similarity-search-benchmarks
+	allPairBmsPosBenchmarkFilename  = "BMS-POS_dup_dr.inp.gz"
+	allPairBmsPosBenchmarkResult    = "BMS-POS_dup_dr_all_pairs.csv"
+	allPairBmsPosBenchmarkThreshold = 0.2
+	allPairBmsPosBenchmarkMinSize   = 1
+	allPairBmsPosBenchmarkFunction  = "jaccard"
 )
 
 var (
@@ -38,24 +47,36 @@ var (
 )
 
 func BenchmarkOpenDataAllPair(b *testing.B) {
+	benchmarkAllPairRowFile(b, allPairOpenDataBenchmarkFilename,
+		allPairOpenDataBenchmarkResult, allPairOpenDataBenchmarkFunction,
+		allPairOpenDataBenchmarkThreshold, allPairOpenDataBenchmarkMinSize)
+}
+
+func BenchmarkBmsPosAllPair(b *testing.B) {
+	benchmarkAllPairRowFile(b, allPairBmsPosBenchmarkFilename,
+		allPairBmsPosBenchmarkResult, allPairBmsPosBenchmarkFunction,
+		allPairBmsPosBenchmarkThreshold, allPairBmsPosBenchmarkMinSize)
+}
+
+func benchmarkAllPairRowFile(b *testing.B, benchmarkFile, resultFile, function string, threshold float64, minSize int) {
 	log.Printf("Reading transformed sets from %s",
-		allPairOpenDataBenchmarkFilename)
+		benchmarkFile)
 	start := time.Now()
-	sets := readGzippedTransformedSets(allPairOpenDataBenchmarkFilename,
+	sets := readGzippedTransformedSets(benchmarkFile,
 		/*firstLineInfo=*/ true,
-		allPairOpenDataBenchmarkMinSize)
+		minSize)
 	log.Printf("Finished reading %d transformed sets in %s", len(sets),
 		time.Now().Sub(start).String())
 	log.Printf("Running AllPairs algorithm")
-	out, err := os.Create(allPairOpenDataBenchmarkResult)
+	out, err := os.Create(resultFile)
 	if err != nil {
 		b.Fatal(err)
 	}
 	defer out.Close()
 	w := csv.NewWriter(out)
 	start = time.Now()
-	pairs, err := AllPairs(sets, allPairOpenDataBenchmarkFunction,
-		allPairOpenDataBenchmarkThreshold)
+	pairs, err := AllPairs(sets, function,
+		threshold)
 	for pair := range pairs {
 		w.Write([]string{
 			strconv.Itoa(pair.X),
@@ -71,7 +92,7 @@ func BenchmarkOpenDataAllPair(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	log.Printf("Results written to %s", allPairOpenDataBenchmarkResult)
+	log.Printf("Results written to %s", resultFile)
 }
 
 func BenchmarkPokecAllPair(b *testing.B) {
