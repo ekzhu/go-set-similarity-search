@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -118,4 +119,59 @@ func ReadFlattenedSortedRawSets(file io.Reader) (setIDs []string,
 	setIDs = append(setIDs, currSetID)
 	rawSets = append(rawSets, currSet)
 	return setIDs, rawSets, nil
+}
+
+// ReadFlattenedSortedTransformedSets takes an input of a flattened
+// transformed set file,
+// that contains unique lines in the format "<set ID:int> <token:int>",
+// sorted by <set ID>, and returns the extracted set IDs and raw sets.
+// Lines starting with "#" are ignored,
+func ReadFlattenedSortedTransformedSets(file io.Reader) (setIDs []int,
+	sets [][]int, err error) {
+	// Create raw sets by merging flattened entries.
+	setIDs = make([]int, 0)
+	sets = make([][]int, 0)
+	var currSetID int
+	firstLine := true
+	currSet := make([]int, 0)
+	scanner := bufio.NewScanner(file)
+	scanner.Buffer(nil, 1024*1024*1024*4)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) != 2 {
+			return nil, nil, errors.New("incorrect line detected")
+		}
+		setID, err := strconv.Atoi(fields[0])
+		if err != nil {
+			return nil, nil, err
+		}
+		token, err := strconv.Atoi(fields[1])
+		if err != nil {
+			return nil, nil, err
+		}
+		if firstLine {
+			currSetID = setID
+			firstLine = false
+		}
+		if setID != currSetID {
+			// Append the completed set.
+			setIDs = append(setIDs, currSetID)
+			sets = append(sets, currSet)
+			// Create new set.
+			currSetID = setID
+			currSet = make([]int, 0)
+		}
+		currSet = append(currSet, token)
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, nil, err
+	}
+	// Append the last set.
+	setIDs = append(setIDs, currSetID)
+	sets = append(sets, currSet)
+	return setIDs, sets, nil
 }

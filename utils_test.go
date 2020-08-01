@@ -124,3 +124,47 @@ func TestReadFlattenedSortedRawSets(t *testing.T) {
 		}
 	}
 }
+
+func TestReadFlattenedSortedTransformedSets(t *testing.T) {
+	testInput := `# Test input
+1 0
+1 1
+1 2
+1 3
+2 4
+2 5
+2 6
+3 7
+3 1
+3 2
+3 3
+4 4
+4 5
+4 6
+`
+	// Test forward.
+	correctSetIDs := []int{1, 2, 3, 4}
+	correctRawSets := [][]int{
+		[]int{0, 1, 2, 3},
+		[]int{4, 5, 6},
+		[]int{7, 1, 2, 3},
+		[]int{4, 5, 6},
+	}
+	file := bytes.NewBufferString(testInput)
+	setIDs, rawSets, err := ReadFlattenedSortedTransformedSets(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := range setIDs {
+		if setIDs[i] != correctSetIDs[i] {
+			t.Errorf("Incorrect set ID %v", setIDs[i])
+		}
+	}
+	for i, rawSet := range rawSets {
+		for j := range rawSet {
+			if rawSet[j] != correctRawSets[i][j] {
+				t.Errorf("Incorrect raw set %v", rawSet)
+			}
+		}
+	}
+}
