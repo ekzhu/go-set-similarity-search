@@ -76,7 +76,7 @@ func jaccardOverlapThresholdFunc(x int, t float64) int {
 var jaccardOverlapIndexThresholdFunc = jaccardOverlapThresholdFunc
 
 func cosineOverlapThresholdFunc(x int, t float64) int {
-	return int(math.Sqrt(float64(x)) * t)
+	return int(math.Ceil(math.Sqrt(float64(x)) * t))
 }
 
 var cosineOverlapIndexThresholdFunc = cosineOverlapThresholdFunc
